@@ -22,6 +22,8 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.batch:spring-batch-test'
+	implementation 'org.apache.logging.log4j:log4j-api:2.22.1'
+	implementation 'org.apache.logging.log4j:log4j-core:2.22.1'
 }
 
 tasks.named('test') {

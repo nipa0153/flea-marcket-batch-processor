@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<Configuration status="warn" name="flea-marcket-batch-processor">
+    <Properties>
+        <Property name="format1">%d{yyyy/MM/dd HH:mm:ss.SSS} [%t] %-6p %c{5} %n%m%n</Property>
+        <Property name="logfile">./logs/category.log</Property>
+        <Property name="logfile-archive">logs/category-%d{HH:mm:ss}-%i.log</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${format1}" />
+        </Console>
+        <RollingFile name="category0001" append="true" fileName="${logfile}" filePattern="${logfile-archive}">
+            <PatternLayout>
+                <Pattern>${format1}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="category0001" />
+        </Root>
+    </Loggers>
+</Configuration>
