@@ -6,9 +6,11 @@ spring:
     batch:
         job:
             enabled: true
-# server:
-#     servlet:
-#         context-path: /gs-batch-processing
+        jdbc:
+            initialize-schema: never
+server:
+    servlet:
+        context-path: /gs-batch-processing
 logging:
     level:
         '[org.springframework.batch.item.database]': DEBUG
