@@ -19,7 +19,7 @@ public class CategoryItemProcessor implements ItemProcessor<Original, Category> 
     }
 
     private static final String SQL = """
-            SELECT id FROM category WHERE name = ?
+            SELECT id FROM category WHERE name = :name;
             """;
 
     @Override

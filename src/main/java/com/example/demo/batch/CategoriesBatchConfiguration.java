@@ -14,8 +14,11 @@ import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.support.CompositeItemWriter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
@@ -45,7 +48,7 @@ public class CategoriesBatchConfiguration {
                 )
             VALUES
                 (:name
-                , :parent_id
+                , :parentId
                 )
             """;
     private static final String INSERT_INTO_GRAND_CHILD_CATEGORIES = """
@@ -56,23 +59,34 @@ public class CategoriesBatchConfiguration {
                 )
             VALUES
                 (:name
-                , :parent_id
-                , :name_all
+                , :parentId
+                , :nameAll
                 )
             """;
+    @Autowired
+    public DataSource dataSource;
+    // @Bean
+    // public DataSource dataSource() {
+    // DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+    // dataSourceBuilder.url("jdbc:postgresql://localhost:5432/gs-batch-processing");
+    // dataSourceBuilder.username("postgres");
+    // dataSourceBuilder.driverClassName("org.postgresql.Driver");
+    // return dataSourceBuilder.build();
+    // }
 
     @Bean
-    public JdbcCursorItemReader<Original> reader(@NonNull DataSource dataSource) {
+    public JdbcCursorItemReader<Original> reader() {
         return new JdbcCursorItemReaderBuilder<Original>()
                 .name("originalReader")
                 .dataSource(dataSource)
-                .sql("SELECT id, category_name FROM originals ORDER BY id ASC LIMIT 100;")
-                .rowMapper((rs, i) -> {
-                    Original original = new Original();
-                    original.setId(rs.getInt("id"));
-                    original.setCategoryName(rs.getString("category_name"));
-                    return original;
-                })
+                .sql("SELECT id,  category_name FROM originals ORDER BY id;")
+                .rowMapper(new BeanPropertyRowMapper<>(Original.class))
+                // .rowMapper((rs, i) -> {
+                // Original original = new Original();
+                // original.setId(rs.getInt("id"));
+                // original.setCategoryName(rs.getString("category_name"));
+                // return original;
+                // })
                 .build();
     }
 
@@ -88,7 +102,7 @@ public class CategoriesBatchConfiguration {
      * @return
      */
     @Bean
-    public JdbcBatchItemWriter<Category> writerForParentCategories(DataSource dataSource) {
+    public JdbcBatchItemWriter<Category> writerForParentCategories() {
         return new JdbcBatchItemWriterBuilder<Category>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .sql(INSERT_INTO_PARENT_CATEGORIES)
@@ -159,7 +173,7 @@ public class CategoriesBatchConfiguration {
                 writerForParentCategories, writerForChildCategories, writerForGrandChildCategories);
 
         return new StepBuilder("step1", jobRepository)
-                .listener(new CategoryStepExecutionListener())
+                .listener(listener)
                 .<Original, Category>chunk(50000, transactionManager)
                 .reader(reader)
                 .processor(processor)
