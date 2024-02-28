@@ -1,13 +1,16 @@
-package com.example.demo.domain;
+package com.example.DTO;
 
-public class Category {
+public class CategoryDto {
     private Integer id;
-    private String name;
     private Integer parentId;
+    private String name;
     private String nameAll;
     private String parent;
     private String child;
     private String grandChild;
+
+    public CategoryDto() {
+    }
 
     public Integer getId() {
         return id;
@@ -17,20 +20,20 @@ public class Category {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Integer getParentId() {
         return parentId;
     }
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getNameAll() {
@@ -67,7 +70,8 @@ public class Category {
 
     @Override
     public String toString() {
-        return "Category [id=" + id + ", name=" + name + ", parentId=" + parentId + ", nameAll=" + nameAll + ", parent="
-                + parent + ", child=" + child + ", grandChild=" + grandChild + "]";
+        return "categoryDto [id=" + id + ", parentId=" + parentId + ", name=" + name + ", nameAll=" + nameAll
+                + ", parent=" + parent + ", child=" + child + ", grandChild=" + grandChild + "]";
     }
+
 }

@@ -1,6 +1,6 @@
-package com.example.demo.dto;
+package com.example.Domain;
 
-public class OriginalsDto {
+public class Original {
     private Integer id;
     private String name;
     private Integer conditionId;
@@ -9,6 +9,9 @@ public class OriginalsDto {
     private Double price;
     private Integer shipping;
     private String description;
+
+    public Original() {
+    }
 
     public Integer getId() {
         return id;
@@ -76,7 +79,7 @@ public class OriginalsDto {
 
     @Override
     public String toString() {
-        return "Original [id=" + id + ", name=" + name + ", conditionId=" + conditionId + ", categoryName="
+        return "original [id=" + id + ", name=" + name + ", conditionId=" + conditionId + ", categoryName="
                 + categoryName + ", brand=" + brand + ", price=" + price + ", shipping=" + shipping + ", description="
                 + description + "]";
     }
