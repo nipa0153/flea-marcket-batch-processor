@@ -1,4 +1,4 @@
-package com.example.demo.batch;
+package com.example.CategoryBatch;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;

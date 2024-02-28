@@ -1,4 +1,4 @@
-package com.example.demo.batch;
+package com.example.CategoryBatch;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,10 +6,11 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.example.demo.domain.Category;
-import com.example.demo.domain.Original;
+import com.example.DTO.CategoryDto;
+import com.example.Domain.Category;
+import com.example.Domain.Original;
 
-public class CategoryItemProcessor implements ItemProcessor<Original, Category> {
+public class CategoryItemProcessor implements ItemProcessor<Original, CategoryDto> {
 
     private final Logger log = LogManager.getLogger(CategoryItemProcessor.class);
     private JdbcTemplate template;
@@ -19,11 +20,11 @@ public class CategoryItemProcessor implements ItemProcessor<Original, Category> 
     }
 
     private static final String SQL = """
-            SELECT id FROM category WHERE name = :name;
+            SELECT id FROM originals WHERE name = ?;
             """;
 
     @Override
-    public Category process(Original original) throws Exception {
+    public CategoryDto process(Original original) throws Exception {
 
         log.debug("処理開始 Originalテーブル", original);
         if (original.getCategoryName() == null) {
@@ -31,21 +32,21 @@ public class CategoryItemProcessor implements ItemProcessor<Original, Category> 
         }
 
         String[] parts = original.getCategoryName().split("/");
-        Category category = new Category();
+        CategoryDto categoryDto = new CategoryDto();
 
         String parent = parts.length > 0 ? parts[0] : null; // 三項演算子 条件式 ? trueの時に返る値 : falseの時に返る値 if文？
         String child = parts.length > 0 ? parts[1] : null;
         String grandChild = parts.length > 0 ? parts[2] : null;
 
-        category.setName(grandChild != null ? grandChild : (child != null ? child : parent));
+        categoryDto.setName(grandChild != null ? grandChild : (child != null ? child : parent));
 
-        category.setNameAll(String.join("/", parts));
+        categoryDto.setNameAll(String.join("/", parts));
 
         Integer parentId = findCategoryIdByName(parent);
-        category.setParentId(parentId);
+        categoryDto.setParentId(parentId);
 
-        log.debug("処理終了 Category分別終了", category);
-        return category;
+        log.debug("処理終了 Category分別終了", categoryDto);
+        return categoryDto;
     }
 
     /**

@@ -1,7 +1,8 @@
 spring:
     datasource:
-        url: jdbc:postgresql://localhost:5432/gs-batch-processing
+        url: jdbc:postgresql://localhost:5432/fleamarketbatchprocessing
         username: postgres
+        password: postgres
         driver-class-name: org.postgresql.Driver
     batch:
         job:
@@ -10,7 +11,7 @@ spring:
             initialize-schema: never
 server:
     servlet:
-        context-path: /gs-batch-processing
+        context-path: /fleamarketbatchprocessing
 logging:
     level:
         '[org.springframework.batch.item.database]': DEBUG
