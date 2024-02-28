@@ -86,8 +86,8 @@ public class CategoryConfiguration {
             WHERE
                 tc.grandchild IS NOT NULL;
             """;
-    @Autowired
-    public DataSource dataSource;
+    // @Autowired
+    // public DataSource dataSource;
 
     @Autowired
     private JdbcTemplate template;
@@ -102,7 +102,7 @@ public class CategoryConfiguration {
     }
 
     @Bean
-    public JdbcCursorItemReader<CategoryDto> reader() {
+    public JdbcCursorItemReader<CategoryDto> reader(DataSource dataSource) {
         return new JdbcCursorItemReaderBuilder<CategoryDto>()
                 .name("originalReader")
                 .dataSource(dataSource)
@@ -238,7 +238,8 @@ public class CategoryConfiguration {
             CategoryStepExecutionListener listener,
             JdbcBatchItemWriter<Category> parentWriter,
             JdbcBatchItemWriter<Category> childWriter,
-            JdbcBatchItemWriter<Category> grandChildWriter) {
+            JdbcBatchItemWriter<Category> grandChildWriter,
+            DataSource dataSource) {
 
         CompositeItemWriter<Category> compositeItemWriter = compositeItemWriter(dataSource);
 
