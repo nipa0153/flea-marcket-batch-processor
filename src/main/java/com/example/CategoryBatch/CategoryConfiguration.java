@@ -27,7 +27,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import com.example.DTO.CategoryDto;
 import com.example.Domain.Category;
-import com.example.Domain.Original;
 
 import java.util.Arrays;
 
