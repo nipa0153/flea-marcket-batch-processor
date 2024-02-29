@@ -3,9 +3,10 @@ DROP TABLE IF EXISTS temp_category;
 DROP TABLE IF EXISTS categories;
 CREATE TABLE IF NOT EXISTS categories (
     id serial PRIMARY KEY,
-    name text,
+    name text NOT NULL,
     parent_id integer,
-    name_all text
+    name_all text,
+    UNIQUE(name, parent_id)
 );
 -- 一時テーブルの作成
 -- category_nameがNULLでないレコードについて、各階層を抽出

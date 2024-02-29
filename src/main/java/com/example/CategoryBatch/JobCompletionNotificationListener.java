@@ -1,5 +1,8 @@
 package com.example.CategoryBatch;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.BatchStatus;
@@ -20,13 +23,22 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
     }
 
     private static final String CREATE_TEMP_TABLE = """
-            CREATE TEMP TABLE IF NOT EXISTS temp_categories AS
-            SELECT NULLIF(split_part(category_name, '/', 1), '') AS parent,
+            CREATE TEMP TABLE IF NOT EXISTS temp_categories (
+                id SERIAL PRIMARY KEY,
+                parent VARCHAR(255),
+                child VARCHAR(255),
+                grandchild VARCHAR(255)
+                );
+                INSERT INTO temp_categories (parent, child, grandchild)
+                SELECT
+                NULLIF(split_part(category_name, '/', 1), '') AS parent,
                 NULLIF(split_part(category_name, '/', 2), '') AS child,
                 NULLIF(split_part(category_name, '/', 3), '') AS grandchild
-            FROM originals
-            WHERE category_name IS NOT NULL;
-            """;
+                FROM
+                originals
+                WHERE
+                category_name IS NOT NULL;
+                """;
 
     private static final String DROP_TEMP_TABLE = """
             DROP TABLE temp_categories;
