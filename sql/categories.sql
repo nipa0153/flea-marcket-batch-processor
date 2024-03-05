@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS categories (
     id serial PRIMARY KEY,
     name text NOT NULL,
     parent_id integer,
-    name_all text,
-    UNIQUE(name, parent_id)
+    name_all text
 );
+CREATE INDEX idx_categories ON categories(id, name_all);
 -- 一時テーブルの作成
 -- category_nameがNULLでないレコードについて、各階層を抽出
 CREATE TEMP TABLE temp_categories AS

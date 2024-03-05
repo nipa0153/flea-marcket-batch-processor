@@ -3,7 +3,7 @@
 <Configuration status="warn" name="flea-marcket-batch-processor">
     <Properties>
         <Property name="format1">%d{yyyy/MM/dd HH:mm:ss.SSS} [%t] %-6p %c{5} %n%m%n</Property>
-        <Property name="logfile">./logs/category.log</Property>
+        <Property name="logfile">/logs/category.log</Property>
         <Property name="logfile-archive">logs/category-%d{HH:mm:ss}-%i.log</Property>
     </Properties>
     <Appenders>
