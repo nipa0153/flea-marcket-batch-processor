@@ -1,7 +1,5 @@
 package com.example.CategoryBatch.Config;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -10,14 +8,17 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
+import com.example.CategoryBatch.Config.Listener.ChunkCountingListener;
 import com.example.CategoryBatch.Config.Listener.JobCompletionNotificationListener;
-import com.example.CategoryBatch.Tasklet.CategoryTasklet;
+import com.example.CategoryBatch.Tasklet.InsertChildTasklet;
+import com.example.CategoryBatch.Tasklet.InsertGrandChildTasklet;
+import com.example.CategoryBatch.Tasklet.InsertParentTasklet;
 import com.example.DTO.ItemsDto;
 import com.example.Domain.Items;
 
@@ -31,21 +32,6 @@ public class ImportTableConfiguration {
     private JdbcBatchItemWriter<Items> itemWriter;
 
     /**
-     * データソース設定
-     * 
-     * @return
-     */
-    @Bean
-    public DataSource dataSource() {
-        DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url("jdbc:postgresql://localhost:5432/postgres");
-        dataSourceBuilder.username("postgres");
-        dataSourceBuilder.password("postgres");
-        dataSourceBuilder.driverClassName("org.postgresql.Driver");
-        return dataSourceBuilder.build();
-    }
-
-    /**
      * ジョブ
      * 
      * @param jobRepository
@@ -55,33 +41,75 @@ public class ImportTableConfiguration {
      */
     @SuppressWarnings("null")
     @Bean
-    public Job moveToOriginalsJob(JobRepository jobRepository, Step step1, Step step2,
+    @Lazy
+    public Job moveToOriginalsJob(JobRepository jobRepository,
+            Step step1, Step step2, Step step3, Step step4,
             JobCompletionNotificationListener notificationListener) {
         return new JobBuilder("moveToOriginalsJob", jobRepository)
                 .listener(notificationListener)
                 .start(step1)
                 .next(step2)
+                .next(step3)
+                .next(step4)
                 .build();
     }
 
     /**
-     * Categoryステップ
+     * parentをcategoryテーブルに挿入
      * 
      * @param jobRepository
      * @param transactionManager
      * @param template
-     * @param categoryTasklet
-     * @param execution
+     * @param tasklet1
      * @return
      */
     @SuppressWarnings("null")
     @Bean
+    @Lazy
     public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
-            JdbcTemplate template, CategoryTasklet categoryTasklet) {
-
+            JdbcTemplate template, InsertParentTasklet tasklet1) {
         return new StepBuilder("step1", jobRepository)
-                .tasklet(categoryTasklet, transactionManager)
+                .tasklet(tasklet1, transactionManager)
                 .build();
+    }
+
+    /**
+     * childをcategoryテーブルに挿入
+     * 
+     * @param jobRepository
+     * @param transactionManager
+     * @param template
+     * @param tasklet2
+     * @return
+     */
+    @SuppressWarnings("null")
+    @Bean
+    @Lazy
+    public Step step2(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
+            JdbcTemplate template, InsertChildTasklet tasklet2) {
+        return new StepBuilder("step1", jobRepository)
+                .tasklet(tasklet2, transactionManager)
+                .build();
+    }
+
+    /**
+     * grandchildをcategoryテーブルに挿入
+     * 
+     * @param jobRepository
+     * @param transactionManager
+     * @param template
+     * @param tasklet3
+     * @return
+     */
+    @SuppressWarnings("null")
+    @Bean
+    @Lazy
+    public Step step3(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
+            JdbcTemplate template, InsertGrandChildTasklet tasklet3) {
+        return new StepBuilder("step1", jobRepository)
+                .tasklet(tasklet3, transactionManager)
+                .build();
+
     }
 
     /**
@@ -95,9 +123,12 @@ public class ImportTableConfiguration {
      */
     @SuppressWarnings("null")
     @Bean
-    public Step step2(JobRepository jobRepository, DataSourceTransactionManager transactionManager) {
+    @Lazy
+    public Step step4(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
+            ChunkCountingListener listener) {
         return new StepBuilder("Step2", jobRepository)
                 .<ItemsDto, Items>chunk(100000, transactionManager)
+                .listener(listener)
                 .reader(itemReader)
                 .writer(itemWriter)
                 .build();

@@ -16,7 +16,7 @@ public class ReaderConfig {
 
     private DataSource dataSource;
 
-    public ReaderConfig(@Lazy DataSource dataSource) {
+    public ReaderConfig(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -46,22 +46,6 @@ public class ReaderConfig {
             FROM originals AS o;
 
                 """;
-    // SELECT o.name AS o_name,
-    // o.condition_id AS o_condition,
-    // CASE
-    // WHEN o.category_name IS NOT NULL THEN (
-    // SELECT c.id AS c_id
-    // FROM categories AS c
-    // WHERE c.name_all = o.category_name
-    // LIMIT 1
-    // )
-    // ELSE NULL
-    // END AS category,
-    // o.brand AS o_brand,
-    // o.price AS o_price,
-    // o.shipping AS o_shipping,
-    // o.description AS o_description
-    // FROM originals AS o;
 
     private static final RowMapper<ItemsDto> ITEMS_ROW_MAPPER = (rs, i) -> {
         ItemsDto itemsDto = new ItemsDto();
@@ -84,6 +68,7 @@ public class ReaderConfig {
      */
     @SuppressWarnings("null")
     @Bean
+    @Lazy
     public JdbcCursorItemReader<ItemsDto> itemReader() {
         return new JdbcCursorItemReaderBuilder<ItemsDto>()
                 .dataSource(dataSource)

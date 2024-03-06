@@ -16,7 +16,7 @@ public class WriteConfig {
 
     private DataSource dataSource;
 
-    public WriteConfig(@Lazy DataSource dataSource) {
+    public WriteConfig(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -53,6 +53,7 @@ public class WriteConfig {
      */
     @SuppressWarnings("null")
     @Bean
+    @Lazy
     public JdbcBatchItemWriter<Items> itemWriter() {
         return new JdbcBatchItemWriterBuilder<Items>()
                 .sql(INSERT_INTO_ITEMS)

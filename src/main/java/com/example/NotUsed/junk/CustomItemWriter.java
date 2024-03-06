@@ -1,4 +1,4 @@
-package com.example.ChunkBatch.junk;
+package com.example.NotUsed.junk;
 // package com.example.ChunkBatch;
 // package com.example.CategoryBatch.Config.Writer;
 
