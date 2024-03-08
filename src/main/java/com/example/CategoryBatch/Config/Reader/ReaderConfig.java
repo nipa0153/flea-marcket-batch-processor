@@ -22,6 +22,7 @@ public class ReaderConfig {
 
     private static final String SELECT_ORIGINALS = """
                 SELECT
+                o.id AS o_id,
                 o.name AS o_name,
                 o.condition_id AS o_condition_id,
                 c.id AS category,
@@ -48,6 +49,7 @@ public class ReaderConfig {
     private static final RowMapper<ItemsDto> ITEMS_ROW_MAPPER = (rs, i) -> {
         ItemsDto itemsDto = new ItemsDto();
 
+        itemsDto.setId(rs.getInt("o_id"));
         itemsDto.setName(rs.getString("o_name"));
         itemsDto.setConditionId(rs.getInt("o_condition_id"));
         itemsDto.setCategory(rs.getInt("category"));

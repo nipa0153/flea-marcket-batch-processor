@@ -4,18 +4,33 @@
     <Properties>
         <Property name="logFilePath">/Users/sakaidashigeaki/src/github.com/ShigeakiSakaida/flea-marcket-batch-processor/flea-marcket-batch-processor/log/</Property>
         <Property name="logFormat">%d{yyyy/MM/dd HH:mm:ss.SSS} [%t] %highlight{%-6level} %c{5} %msg%n%</Property>
-        <Property name="logFileName">error_items</Property>
-        <Property name="logFilePathName">${sys:logFilePath}${sys:logFileName}.log</Property>
-        <Property name="logRollingFilePathName">${sys:logFilePathName}-%d{yyyy-MM-dd}.log.zip</Property>
+        <Property name="logFileFormat">%d{yyyy/MM/dd HH:mm:ss.SSS} [%t] %c{5} %msg%n%</Property>
+
+        <!-- cunk完了件数 ログ-->
+        <Property name="logFileName1">finished_chunk</Property>
+        <Property name="logFilePathName1">${sys:logFilePath}finished_chunk/${sys:logFileName1}.log</Property>
+        <Property name="logRollingFilePathName1">${sys:logFilePathName1}-%d{yyyy-MM-dd}.log.zip</Property>
+
+        <!-- category null除外 ログ-->
+        <Property name="logFileName2">null_items</Property>
+        <Property name="logFilePathName2">${sys:logFilePath}null_items/${sys:logFileName2}.log</Property>
+        <Property name="logRollingFilePathName2">${sys:logFilePathName2}-%d{yyyy-MM-dd}.log.zip</Property>
     </Properties>
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT" follow="true">
             <PatternLayout pattern="${sys:logFormat}" charset="UTF-8"/>
         </Console>
-        <!-- ファイル出力 -->
-        <RollingFile name="File_App" fileName="${sys:logFilePathName}" filePattern="${sys:logRollingFilePathName}">
-            <PatternLayout pattern="${sys:logFormat}" charset="UTF-8" />
+        <!-- chunk完了件数 ログ ファイル -->
+        <RollingFile name="FinishedChunk" fileName="${sys:logFilePathName1}" filePattern="${sys:logRollingFilePathName1}">
+            <PatternLayout pattern="${sys:logFileFormat}" charset="UTF-8" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+        <!-- category null除外 ログ ファイル-->
+        <RollingFile name="NullItems" fileName="${sys:logFilePathName2}" filePattern="${sys:logRollingFilePathName2}">
+            <PatternLayout pattern="${sys:logFileFormat}" charset="UTF-8" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
             </Policies>
@@ -27,8 +42,11 @@
             <AppenderRef ref="Console" />
         </Root>
         <Logger name="com.example.CategoryBatch.Config.Listener.ChunkCountingListener" level="INFO" additivity="false">
-            <AppenderRef ref="File_App"/>
+            <AppenderRef ref="FinishedChunk"/>
             <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="com.example.CategoryBatch.Config.Processor.ItemCategoryCheckProcessor" level="INFO" additivity="false">
+            <AppenderRef ref="NullItems"/>
         </Logger>
         <Logger name="springframework.boot.autoconfigure.batch.JobLauncherApplicationRunner" level="ERROR" />
         <Logger name="com.example.DemoApplication" level="ERROR"/>
