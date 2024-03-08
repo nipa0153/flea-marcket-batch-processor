@@ -16,6 +16,8 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import com.example.CategoryBatch.Config.Listener.ChunkCountingListener;
 import com.example.CategoryBatch.Config.Listener.JobCompletionNotificationListener;
+import com.example.CategoryBatch.Config.Listener.StepCompletionNotificationListener;
+import com.example.CategoryBatch.Config.Processor.ItemCategoryCheckProcessor;
 import com.example.CategoryBatch.Tasklet.InsertChildTasklet;
 import com.example.CategoryBatch.Tasklet.InsertGrandChildTasklet;
 import com.example.CategoryBatch.Tasklet.InsertParentTasklet;
@@ -25,113 +27,121 @@ import com.example.Domain.Items;
 @Configuration
 public class ImportTableConfiguration {
 
-    @Autowired
-    private JdbcCursorItemReader<ItemsDto> itemReader;
+        @Autowired
+        private JdbcCursorItemReader<ItemsDto> itemReader;
 
-    @Autowired
-    private JdbcBatchItemWriter<Items> itemWriter;
+        @Autowired
+        private JdbcBatchItemWriter<Items> itemWriter;
 
-    /**
-     * ジョブ
-     * 
-     * @param jobRepository
-     * @param step1
-     * @param listener
-     * @return
-     */
-    @SuppressWarnings("null")
-    @Bean
-    @Lazy
-    public Job moveToOriginalsJob(JobRepository jobRepository,
-            Step step1, Step step2, Step step3, Step step4,
-            JobCompletionNotificationListener notificationListener) {
-        return new JobBuilder("moveToOriginalsJob", jobRepository)
-                .listener(notificationListener)
-                .start(step1)
-                .next(step2)
-                .next(step3)
-                .next(step4)
-                .build();
-    }
+        @Bean
+        public ItemCategoryCheckProcessor processor(ItemsDto itemsDto) {
+                return new ItemCategoryCheckProcessor();
+        }
 
-    /**
-     * parentをcategoryテーブルに挿入
-     * 
-     * @param jobRepository
-     * @param transactionManager
-     * @param template
-     * @param tasklet1
-     * @return
-     */
-    @SuppressWarnings("null")
-    @Bean
-    @Lazy
-    public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
-            JdbcTemplate template, InsertParentTasklet tasklet1) {
-        return new StepBuilder("step1", jobRepository)
-                .tasklet(tasklet1, transactionManager)
-                .build();
-    }
+        /**
+         * ジョブ
+         * 
+         * @param jobRepository
+         * @param step1
+         * @param listener
+         * @return
+         */
+        @SuppressWarnings("null")
+        @Bean
+        @Lazy
+        public Job moveToOriginalsJob(JobRepository jobRepository,
+                        Step step1, Step step2, Step step3, Step step4,
+                        JobCompletionNotificationListener notificationListener) {
+                return new JobBuilder("moveToOriginalsJob", jobRepository)
+                                .listener(notificationListener)
+                                .start(step1)
+                                .next(step2)
+                                .next(step3)
+                                .next(step4)
+                                .build();
+        }
 
-    /**
-     * childをcategoryテーブルに挿入
-     * 
-     * @param jobRepository
-     * @param transactionManager
-     * @param template
-     * @param tasklet2
-     * @return
-     */
-    @SuppressWarnings("null")
-    @Bean
-    @Lazy
-    public Step step2(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
-            JdbcTemplate template, InsertChildTasklet tasklet2) {
-        return new StepBuilder("step1", jobRepository)
-                .tasklet(tasklet2, transactionManager)
-                .build();
-    }
+        /**
+         * parentをcategoryテーブルに挿入
+         * 
+         * @param jobRepository
+         * @param transactionManager
+         * @param template
+         * @param tasklet1
+         * @return
+         */
+        @SuppressWarnings("null")
+        @Bean
+        @Lazy
+        public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
+                        JdbcTemplate template, InsertParentTasklet tasklet1) {
+                return new StepBuilder("step1", jobRepository)
+                                .tasklet(tasklet1, transactionManager)
+                                .build();
+        }
 
-    /**
-     * grandchildをcategoryテーブルに挿入
-     * 
-     * @param jobRepository
-     * @param transactionManager
-     * @param template
-     * @param tasklet3
-     * @return
-     */
-    @SuppressWarnings("null")
-    @Bean
-    @Lazy
-    public Step step3(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
-            JdbcTemplate template, InsertGrandChildTasklet tasklet3) {
-        return new StepBuilder("step1", jobRepository)
-                .tasklet(tasklet3, transactionManager)
-                .build();
+        /**
+         * childをcategoryテーブルに挿入
+         * 
+         * @param jobRepository
+         * @param transactionManager
+         * @param template
+         * @param tasklet2
+         * @return
+         */
+        @SuppressWarnings("null")
+        @Bean
+        @Lazy
+        public Step step2(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
+                        JdbcTemplate template, InsertChildTasklet tasklet2) {
+                return new StepBuilder("step1", jobRepository)
+                                .tasklet(tasklet2, transactionManager)
+                                .build();
+        }
 
-    }
+        /**
+         * grandchildをcategoryテーブルに挿入
+         * 
+         * @param jobRepository
+         * @param transactionManager
+         * @param template
+         * @param tasklet3
+         * @return
+         */
+        @SuppressWarnings("null")
+        @Bean
+        @Lazy
+        public Step step3(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
+                        JdbcTemplate template, InsertGrandChildTasklet tasklet3) {
+                return new StepBuilder("step1", jobRepository)
+                                .tasklet(tasklet3, transactionManager)
+                                .build();
 
-    /**
-     * itemsステップ
-     * 
-     * @param jobRepository
-     * @param transactionManager
-     * @param itemReader
-     * @param itemWriter
-     * @return
-     */
-    @SuppressWarnings("null")
-    @Bean
-    @Lazy
-    public Step step4(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
-            ChunkCountingListener listener) {
-        return new StepBuilder("Step2", jobRepository)
-                .<ItemsDto, Items>chunk(100000, transactionManager)
-                .listener(listener)
-                .reader(itemReader)
-                .writer(itemWriter)
-                .build();
-    }
+        }
+
+        /**
+         * itemsステップ
+         * 
+         * @param jobRepository
+         * @param transactionManager
+         * @param itemReader
+         * @param itemWriter
+         * @return
+         */
+        @SuppressWarnings("null")
+        @Bean
+        @Lazy
+        public Step step4(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
+                        StepCompletionNotificationListener stepListener, ItemCategoryCheckProcessor processor,
+                        ChunkCountingListener listener) {
+                return new StepBuilder("Step2", jobRepository)
+                                .<ItemsDto, Items>chunk(10000, transactionManager)
+                                .listener(stepListener)
+                                .listener(listener)
+                                .reader(itemReader)
+                                .processor(processor)
+                                .writer(itemWriter)
+                                .build();
+        }
 
 }
