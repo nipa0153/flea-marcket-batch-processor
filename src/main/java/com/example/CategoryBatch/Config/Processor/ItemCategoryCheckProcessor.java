@@ -1,7 +1,7 @@
 package com.example.CategoryBatch.Config.Processor;
 
-// import org.apache.logging.log4j.LogManager;
-// import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +11,7 @@ import com.example.Domain.Items;
 @Component
 public class ItemCategoryCheckProcessor implements ItemProcessor<ItemsDto, Items> {
 
-    // private final Logger log =
-    // LogManager.getLogger(ItemCategoryCheckProcessor.class);
+    private final Logger log = LogManager.getLogger(ItemCategoryCheckProcessor.class);
     private MakeCsvFile makeCsvFile = new MakeCsvFile();
 
     @SuppressWarnings("null")
@@ -22,7 +21,7 @@ public class ItemCategoryCheckProcessor implements ItemProcessor<ItemsDto, Items
         if (itemsDto.getCategory().equals(0)) {
             makeCsvFile.saveAsCsv(itemsDto,
                     "/Users/sakaidashigeaki/src/github.com/ShigeakiSakaida/flea-marcket-batch-processor/flea-marcket-batch-processor/error_data/error.csv");
-            // log.info("categoryがnullのためid" + itemsDto.getId() + "番を除外してCSVファイルに保管しました");
+            log.info("category is『 null 』 id: " + itemsDto.getId() + "を除外して『error.csv』保管しました");
         } else {
             items.setName(itemsDto.getName());
             items.setConditionId(itemsDto.getConditionId());
