@@ -27,7 +27,7 @@ public class WriteConfig {
     private static final String INSERT_INTO_ITEMS = """
             INSERT INTO items (
                 name
-                , condition
+                , condition_id
                 , category
                 , brand
                 , price
@@ -36,13 +36,13 @@ public class WriteConfig {
                 )
             VALUES (
                 :name
-                , :condition
+                , :conditionId
                 , :category
                 , :brand
                 , :price
                 , :shipping
                 , :description
-            )
+            );
                         """;
 
     /**

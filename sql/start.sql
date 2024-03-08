@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS items;
 CREATE TABLE IF NOT EXISTS items(
     id serial not null,
     name text,
-    condition integer,
+    condition_id integer,
     category integer,
     brand text,
     price double precision,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS items(
     primary key(id)
 );
 -- category テーブルの作成
-DROP TABLE IF EXISTS temp_category;
+DROP TABLE IF EXISTS temp_categories;
 DROP TABLE IF EXISTS categories;
 CREATE TABLE IF NOT EXISTS categories (
     id serial PRIMARY KEY,

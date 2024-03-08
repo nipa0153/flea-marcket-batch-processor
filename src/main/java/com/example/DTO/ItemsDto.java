@@ -1,10 +1,13 @@
 package com.example.DTO;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ItemsDto {
 
     private Integer id;
     private String name;
-    private Integer condition;
+    private Integer conditionId;
     private Integer category;
     private String nameAll;
     private String brand;
@@ -31,12 +34,12 @@ public class ItemsDto {
         this.name = name;
     }
 
-    public Integer getCondition() {
-        return condition;
+    public Integer getConditionId() {
+        return conditionId;
     }
 
-    public void setCondition(Integer condition) {
-        this.condition = condition;
+    public void setConditionId(Integer conditionId) {
+        this.conditionId = conditionId;
     }
 
     public Integer getCategory() {
@@ -89,7 +92,7 @@ public class ItemsDto {
 
     @Override
     public String toString() {
-        return "ItemsDto [id=" + id + ", name=" + name + ", condition=" + condition + ", category=" + category
+        return "ItemsDto [id=" + id + ", name=" + name + ", conditionId=" + conditionId + ", category=" + category
                 + ", nameAll=" + nameAll + ", brand=" + brand + ", price=" + price + ", shipping=" + shipping
                 + ", description=" + description + "]";
     }

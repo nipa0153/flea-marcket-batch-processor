@@ -30,10 +30,9 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
                 NULLIF(split_part(category_name, '/', 3), '') AS grandchild
             FROM originals
             WHERE category_name IS NOT NULL;
-
-                                        """;
+            """;
     private static final String DROP_TEMP_TABLE = """
-                DROP TABLE temp_categories;
+            DROP TABLE temp_categories;
             """;
 
     /**
@@ -58,7 +57,6 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
     public void afterJob(@SuppressWarnings("null") JobExecution jobExecution) {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
             log.info("処理が完了しました");
-
             template.execute(DROP_TEMP_TABLE);
             log.info("一時テーブルを削除します");
         }

@@ -21,37 +21,35 @@ public class ReaderConfig {
     }
 
     private static final String SELECT_ORIGINALS = """
-                SELECT o.name AS o_name,
+                SELECT
+                o.name AS o_name,
                 o.condition_id AS o_condition_id,
-                COALESCE(
-                    (
-                        SELECT c.id
-                        FROM categories AS c
-                        WHERE -- category_nameから最初の3階層を抽出して比較
-                            c.name_all = CONCAT(
-                                NULLIF(split_part(o.category_name, '/', 1), ''),
-                                '/',
-                                NULLIF(split_part(o.category_name, '/', 2), ''),
-                                '/',
-                                NULLIF(split_part(o.category_name, '/', 3), '')
-                            )
-                        LIMIT 1
-                    ), -- カテゴリが見つからない場合はNULLを挿入
-                    NULL
-                ) AS category,
+                c.id AS category,
                 o.brand AS o_brand,
                 o.price AS o_price,
                 o.shipping AS o_shipping,
                 o.description AS o_description
-            FROM originals AS o;
+            FROM
+                originals AS o
+            JOIN (
+                SELECT
+                    id,
+                    split_part(category_name, '/', 1) || '/' ||
+                    split_part(category_name, '/', 2) || '/' ||
+                    split_part(category_name, '/', 3) AS category_name_modified
+                FROM
+                    originals
+                ) AS modified_category_names ON o.id = modified_category_names.id
+            LEFT JOIN
+                categories AS c ON c.name_all = modified_category_names.category_name_modified;
+                    """;
 
-                """;
-
+    @SuppressWarnings("unused")
     private static final RowMapper<ItemsDto> ITEMS_ROW_MAPPER = (rs, i) -> {
         ItemsDto itemsDto = new ItemsDto();
 
         itemsDto.setName(rs.getString("o_name"));
-        itemsDto.setCondition(rs.getInt("o_condition_id"));
+        itemsDto.setConditionId(rs.getInt("o_condition_id"));
         itemsDto.setCategory(rs.getInt("category"));
         itemsDto.setBrand(rs.getString("o_brand"));
         itemsDto.setPrice(rs.getDouble("o_price"));

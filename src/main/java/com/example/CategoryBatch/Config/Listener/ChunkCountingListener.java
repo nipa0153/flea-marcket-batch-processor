@@ -14,8 +14,6 @@ public class ChunkCountingListener implements ChunkListener {
     @SuppressWarnings("null")
     @Override
     public void afterChunk(ChunkContext chunkContext) {
-        log.info("Chunk:" + chunkContext.getStepContext().getStepName());
-        log.info("読み込み件数:" + chunkContext.getStepContext().getStepExecution().getReadCount());
         log.info("書き出し件数:" + chunkContext.getStepContext().getStepExecution().getWriteCount());
         log.info("処理終了件数:" + chunkContext.getStepContext().getStepExecution().getCommitCount());
 

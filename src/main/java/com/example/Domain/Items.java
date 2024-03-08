@@ -1,9 +1,12 @@
 package com.example.Domain;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Items {
     private Integer id;
     private String name;
-    private Integer condition;
+    private Integer conditionId;
     private Integer category;
     private String brand;
     private Double price;
@@ -12,7 +15,8 @@ public class Items {
 
     @Override
     public String toString() {
-        return "Items [id=" + id + ", name=" + name + ", condition=" + condition + ", category=" + category + ", brand="
+        return "Items [id=" + id + ", name=" + name + ", conditionId=" + conditionId + ", category=" + category
+                + ", brand="
                 + brand + ", price=" + price + ", shipping=" + shipping + ", description=" + description + "]";
     }
 
@@ -35,12 +39,12 @@ public class Items {
         this.name = name;
     }
 
-    public Integer getCondition() {
-        return condition;
+    public Integer getConditionId() {
+        return conditionId;
     }
 
-    public void setCondition(Integer condition) {
-        this.condition = condition;
+    public void setConditionId(Integer conditionId) {
+        this.conditionId = conditionId;
     }
 
     public Integer getCategory() {

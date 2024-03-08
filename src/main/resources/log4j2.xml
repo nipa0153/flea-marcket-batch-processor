@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO" name="flea-marcket-batch-processor">
+<configuration status="INFO">
+
     <Properties>
-        <Property name="format1">%d{yyyy/MM/dd HH:mm:ss.SSS} [%t] %-6p %c{5} %n%m%n</Property>
-        <Property name="logfile">../../../logs/category.log</Property>
-        <Property name="logfile-archive">logs/category-%d{HH:mm:ss}-%i.log</Property>
+        <Property name="logFilePath">/Users/sakaidashigeaki/src/github.com/ShigeakiSakaida/flea-marcket-batch-processor/flea-marcket-batch-processor/log/</Property>
+        <Property name="logFormat">%d{yyyy/MM/dd HH:mm:ss.SSS} [%t] %highlight{%-6level} %c{5} %msg%n%</Property>
+        <Property name="logFileName">error_items</Property>
+        <Property name="logFilePathName">${sys:logFilePath}${sys:logFileName}.log</Property>
+        <Property name="logRollingFilePathName">${sys:logFilePathName}-%d{yyyy-MM-dd}.log.zip</Property>
     </Properties>
+
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="${format1}" />
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${sys:logFormat}" charset="UTF-8"/>
         </Console>
-        <RollingFile name="category0001" append="true" fileName="${logfile}" filePattern="${logfile-archive}">
-            <PatternLayout>
-                <Pattern>${format1}</Pattern>
-            </PatternLayout>
+        <!-- ファイル出力 -->
+        <RollingFile name="File_App" fileName="${sys:logFilePathName}" filePattern="${sys:logRollingFilePathName}">
+            <PatternLayout pattern="${sys:logFormat}" charset="UTF-8" />
             <Policies>
-                <OnStartupTriggeringPolicy />
                 <TimeBasedTriggeringPolicy />
             </Policies>
         </RollingFile>
     </Appenders>
+
     <Loggers>
-        <Root level="TRACE">
+        <Root level="INFO">
             <AppenderRef ref="Console" />
-            <AppenderRef ref="category0001" />
         </Root>
+        <Logger name="com.example.CategoryBatch.Config.Listener.ChunkCountingListener" level="INFO" additivity="false">
+            <AppenderRef ref="File_App"/>
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="springframework.boot.autoconfigure.batch.JobLauncherApplicationRunner" level="ERROR" />
+        <Logger name="com.example.DemoApplication" level="ERROR"/>
+        <Logger name="com.zaxxer.hikari" level="ERROR"/>
+        <Logger name="org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer" level="ERROR"/>
+        <Logger name="org.springframework.batch.core" level="ERROR"/>
+        <Logger name="org.springframework.context.support" level="ERROR"/>
     </Loggers>
-</Configuration>
+</configuration>

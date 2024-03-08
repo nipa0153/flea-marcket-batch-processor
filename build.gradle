@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.2.2'
+	id 'org.springframework.boot' version '3.2.3'
 	id 'io.spring.dependency-management' version '1.1.4'
 }
 
@@ -14,7 +14,35 @@ java {
 repositories {
 	mavenCentral()
 }
+//./gradlew dependenciesで依存関係を確認する。今回はプロジェクトの依存関係の中に、
+//Log4j2以外のロギングフレームワーク（例: Logback）への依存が含まれていないかを確認。
+//これは、GradleやMavenの依存関係ツリーを調べることで行える。
 
+// 依存関係のリストから、Spring Bootがデフォルトで使用するロギングフレームワーク（LogbackとSLF4J）と、
+// プロジェクトで明示的に追加されたLog4j2が混在していることが確認できます。
+// これは、ログ出力の挙動に影響を与え、期待した設定が適用されない原因となる可能性があります。
+// 具体的には、以下の依存関係が関連しています：
+
+// org.springframework.boot:spring-boot-starter-logging: Spring Bootのデフォルトロギングスターターで、
+// LogbackとSLF4Jを含みます。
+// org.apache.logging.log4j:log4j-to-slf4j: Log4j2のAPIからSLF4Jへのブリッジで、Log4j2を使用
+// しようとするログ呼び出しをSLF4J経由で処理します。
+// org.apache.logging.log4j:log4j-apiとorg.apache.logging.log4j:log4j-core: Log4j2のコアライブラリ。
+
+// 解決策
+// Logbackを無効にする: LogbackとSLF4Jの自動設定を無効にし、Log4j2を明示的に使用するようにします。
+// spring-boot-starter-loggingを排除し、spring-boot-starter-log4j2を依存関係に追加することで、
+// Spring BootにLog4j2を使用するよう指示できます
+
+//log4j2を使うために、デフォルトで読み込まれるLogbackを除外する
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
+//	implementation 'org.springframework.boot:spring-boot-starter-log4j2:3.2.3'を追加
+//追加後に./gradlew cleanと./gradlew buildを実行し設定を反映する。jarファイルに変更を反映させるのと、vscodeに変更を反映させること。
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
@@ -22,10 +50,19 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.batch:spring-batch-test'
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 	implementation 'org.apache.logging.log4j:log4j-api:2.22.1'
-	implementation 'org.apache.logging.log4j:log4j-core:2.22.1'
+	implementation 'org.apache.logging.log4j:log4j-core:2.21.1'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+bootRun {
+    jvmArgs = [
+        '-Dlog4j2.debug'
+    ]
+}
+
+
